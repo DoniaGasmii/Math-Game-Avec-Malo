@@ -414,16 +414,14 @@ else:
         try:
             parsed = parse_numeric(user_input)
         except Exception:
-            parsed = user_input.strip()  # allow text answers like "Prime"/"Composite" or "Even"/"Odd"
+            parsed = user_input.strip()
 
         correct = st.session_state.answer
         is_correct = False
 
-        # if the answer is string-based (Prime/Composite, Even/Odd), compare case-insensitive
         if isinstance(correct, str):
             is_correct = str(parsed).strip().lower() == correct.lower()
         else:
-            # numeric compare with tolerance
             try:
                 is_correct = approx_equal(parsed, correct)
             except Exception:
@@ -433,9 +431,7 @@ else:
             st.session_state.total_correct += 1
             st.session_state.streak += 1
             st.session_state.best_streak = max(st.session_state.best_streak, st.session_state.streak)
-            pts = base_points(level)
-            pts += time_bonus(seconds_taken, level)
-            pts += streak_bonus(st.session_state.streak)
+            pts = base_points(level) + time_bonus(seconds_taken, level) + streak_bonus(st.session_state.streak)
             if st.session_state.used_hint:
                 pts = max(1, pts - 3)
             st.session_state.score += pts
@@ -456,10 +452,14 @@ else:
                 if st.session_state.lives <= 0:
                     st.warning("💥 Out of lives!")
                     end_game()
+                    st.rerun()  # ← ensure HUD updates to game over immediately
 
-        # Move to next or stop if ended
-        if st.session_state.started:
+        # 👉 ALWAYS advance if the game is still running (prevents the “décalage”)
+        if st.session_state.started and (
+            st.session_state.lives is None or st.session_state.lives > 0
+        ):
             next_question(level, topic)
+            st.rerun()  # ← immediate UI refresh to show the new question
 
     # Show explanation toggle
     with st.expander("See full explanation / steps"):
