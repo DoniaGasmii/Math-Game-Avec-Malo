@@ -245,6 +245,16 @@ def streak_bonus(streak):
     if streak <= 1: return 0
     return min(10 + (streak - 2) * 2, 30)
 
+def rank_from_score(score):
+    if score < 100: 
+        return "🎓 Rookie"
+    elif score < 300: 
+        return "🏅 Prodigy"
+    elif score < 600: 
+        return "🥇 Math Master"
+    else: 
+        return "🧠 Grand Thinker"
+
 # ---------- Game Flow ----------
 def start_game(mode_key, level, topic):
     st.session_state.started = True
@@ -310,6 +320,8 @@ with st.sidebar:
 hud1, hud2, hud3 = st.columns([1,1,1])
 with hud1:
     st.metric("Score", st.session_state.score)
+    st.metric("Rank", rank_from_score(st.session_state.score))
+
 with hud2:
     st.metric("Streak", f"{st.session_state.streak} 🔥" if st.session_state.streak >= 3 else st.session_state.streak)
 with hud3:
