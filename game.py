@@ -53,6 +53,7 @@ def init_state():
         "used_hint": False,
         "history": [],
         "_advance_now": False,  # rerun flag after submit
+        "high_score": 0,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -322,6 +323,7 @@ with hud1:
 
     st.metric("Score", st.session_state.score)
     st.metric("Rank", rank_from_score(st.session_state.score))
+    st.metric("High Score", st.session_state.high_score)
 
 with hud2:
     st.metric("Streak", f"{st.session_state.streak} 🔥" if st.session_state.streak >= 3 else st.session_state.streak)
@@ -406,6 +408,10 @@ else:
                 if st.session_state.used_hint:
                     pts = max(1, pts - 3)
                 st.session_state.score += pts
+                if st.session_state.score > st.session_state.high_score:
+                    st.session_state.high_score = st.session_state.score
+                    
+
                 answer_feedback.success(
                     f"✅ Correct! +{pts} points  •  ⏱ {seconds_taken:.1f}s  •  Streak {st.session_state.streak} 🔥"
                 )
@@ -460,4 +466,5 @@ st.caption("Tip: you can accept answers like `3/4` (fractions) and `25%` (percen
 if st.session_state.get("_advance_now"):
     st.session_state._advance_now = False
     st.rerun()
+
 
