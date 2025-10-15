@@ -10,7 +10,7 @@ from fractions import Fraction
 import streamlit as st
 
 # ---------- Page Setup ----------
-st.set_page_config(page_title="Math Arcade 🎯", page_icon="🎯", layout="centered")
+st.set_page_config(page_title="#maths ", page_icon="🎯", layout="centered")
 
 PRIMARY_TOPICS = [
     "Add/Subtract",
@@ -466,5 +466,6 @@ st.caption("Tip: you can accept answers like `3/4` (fractions) and `25%` (percen
 if st.session_state.get("_advance_now"):
     st.session_state._advance_now = False
     st.rerun()
+
 
 
