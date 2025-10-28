@@ -31,8 +31,12 @@ from __future__ import annotations
 import time
 import math
 import re
+import os
+from io import BytesIO
+from pathlib import Path
 from typing import Dict, Any, List
 
+from PIL import Image, ImageDraw, ImageFont
 import streamlit as st
 
 # --------------------------
@@ -40,6 +44,12 @@ import streamlit as st
 # --------------------------
 
 st.set_page_config(page_title="Operation CodeQuest — Episode 1", page_icon="🧠", layout="wide")
+# Debugging helper: show current working directory and whether assets exist (hidden under expander)
+with st.expander("🔧 Debug info (optional)"):
+    st.write("CWD:", str(Path.cwd()))
+    for k, v in ASSETS.items():
+        rp = _resolve_path(v)
+        st.write(k, v, "→", str(rp) if rp else "NOT FOUND")
 
 ASSETS = {
     "control_room": "data/images/control_room.jpg",
@@ -56,12 +66,42 @@ SOUNDS = {
     "success": "data/sounds/success.mp3",
 }
 
+# --- Robust asset loading ---
+
+SEARCH_ROOTS = [Path.cwd(), Path.cwd() / "app", Path.cwd() / "src", Path.cwd() / "streamlit_app"]
+
+def _resolve_path(path_str: str | None) -> Path | None:
+    if not path_str:
+        return None
+    p = Path(path_str)
+    if p.exists():
+        return p
+    for root in SEARCH_ROOTS:
+        cand = root / path_str
+        if cand.exists():
+            return cand
+    return None
+
+def _load_image(image_key: str) -> Image.Image:
+    path = _resolve_path(ASSETS.get(image_key))
+    if path and path.exists():
+        try:
+            return Image.open(path).convert("RGB")
+        except Exception:
+            pass
+    # Fallback: generate a simple placeholder so app never crashes
+    img = Image.new("RGB", (1200, 700), (10, 25, 45))
+    draw = ImageDraw.Draw(img)
+    text = f"Missing image: {image_key}"
+    draw.text((30, 30), text, fill=(160, 230, 255))
+    return img
+
 # Helper to display a scene background and title nicely
 
 def scene_header(title: str, image_key: str) -> None:
     col_img, col_title = st.columns([3, 2])
     with col_img:
-        st.image(ASSETS.get(image_key, None), use_container_width=True)
+        st.image(_load_image(image_key), use_container_width=True)
     with col_title:
         st.markdown(f"# {title}")
 
