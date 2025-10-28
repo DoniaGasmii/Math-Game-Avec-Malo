@@ -246,7 +246,7 @@ if st.session_state["scene"] == 0:
 
     st.markdown(
         """
-        You are **Alex Byte**, the youngest computer scientist at **TechNova Labs**.
+        You are **MALO PRELI**, the youngest computer scientist at **TechNova Labs**.
         As you step inside the futuristic glass building, alarms flash **red**.
 
         > **ALERT:** System breach detected. The main AI — *Project Nova* — is **locked**.
