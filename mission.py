@@ -44,20 +44,14 @@ import streamlit as st
 # --------------------------
 
 st.set_page_config(page_title="Operation CodeQuest — Episode 1", page_icon="🧠", layout="wide")
-# Debugging helper: show current working directory and whether assets exist (hidden under expander)
-with st.expander("🔧 Debug info (optional)"):
-    st.write("CWD:", str(Path.cwd()))
-    for k, v in ASSETS.items():
-        rp = _resolve_path(v)
-        st.write(k, v, "→", str(rp) if rp else "NOT FOUND")
 
 ASSETS = {
-    "control_room": "data/images/control_room.jpg",
-    "data_vault": "data/images/data_vault.jpg",
-    "air_chamber": "data/images/air_chamber.jpg",
-    "bit_bot": "data/images/bit_bot.jpg",
-    "debug_chamber": "data/images/debug_chamber.jpg",
-    "final_core": "data/images/final_core.jpg",
+    "control_room": "data/images/control_room.png",
+    "data_vault": "data/images/data_vault.png",
+    "air_chamber": "data/images/air_chamber.png",
+    "bit_bot": "data/images/bit_bot.png",
+    "debug_chamber": "data/images/debug_chamber.png",
+    "final_core": "data/images/final_core.png",
 }
 
 SOUNDS = {
@@ -154,10 +148,23 @@ def render_progress() -> None:
 
 def audio_player(kind: str, label: str) -> None:
     path = SOUNDS.get(kind)
-    if path:
-        with st.expander(f"🔊 {label}"):
-            st.audio(path)
+    with st.expander(f"🔊 {label}"):
+        if path:
+            resolved = _resolve_path(path)
+            if resolved and resolved.exists():
+                st.audio(str(resolved))
+            else:
+                st.caption("Sound file not found (optional).")
+        else:
+            st.caption("No sound configured.")
 
+
+def render_debug() -> None:
+    with st.expander("🔧 Debug info (optional)"):
+        st.write("CWD:", str(Path.cwd()))
+        for k, v in ASSETS.items():
+            rp = _resolve_path(v)
+            st.write(k, v, "→", str(rp) if rp else "NOT FOUND")
 
 # Simple timer widget (manual start). Returns seconds_remaining (can be None if not started)
 
@@ -225,6 +232,7 @@ with right:
 st.write("")
 render_inventory()
 render_progress()
+render_debug()
 
 st.divider()
 
