@@ -342,40 +342,54 @@ elif st.session_state["scene"] == 2:
             st.error("Some answers are off. Check operation opposites, arithmetic, and fractions.")
 
 # Scene 3: Air Chamber — Volumes (cube and rectangular prism)
+# Scene 3: Air Chamber — Volumes (cube and rectangular prism)
 elif st.session_state["scene"] == 3:
     scene_header("The Air Chamber — Balancing Volumes", "air_chamber")
     st.markdown("Pressure is rising! Balance the air by calculating the correct **volumes**.")
 
     timer_widget("air", seconds=120)
 
-    st.markdown("#### Cube")
-    side = st.text_input("Cube side = 3 cm. Volume = ? (in cm³)", key="cube_vol")
+    # --- Cube ---
+    st.subheader("Cube")
+    side = st.number_input("Cube side (cm)", min_value=0, step=1, value=3, key="cube_side")
+    cube_vol = side ** 3
+    st.write(f"Volume = **{cube_vol} cm³**  (formula: L×L×L)")
 
-    st.markdown("#### Rectangular Box")
-    l = st.text_input("Length = 5 cm", key="box_l")
-    w = st.text_input("Width = 2 cm", key="box_w")
-    h = st.text_input("Height = 4 cm", key="box_h")
+    st.markdown("---")
 
-    st.markdown("#### Brain Teaser")
-    bt = st.selectbox("If you double each dimension of a cube, the volume becomes...", ["(choose)", "2 times", "4 times", "8 times"], index=0, key="cube_bt")
+    # --- Rectangular Box ---
+    st.subheader("Rectangular Box")
+    L = st.number_input("Length L (cm)", min_value=0, step=1, value=5, key="box_L")
+    W = st.number_input("Width W (cm)", min_value=0, step=1, value=2, key="box_W")
+    H = st.number_input("Height H (cm)", min_value=0, step=1, value=4, key="box_H")
+    rect_vol = L * W * H
+    st.write(f"Volume = **{rect_vol} cm³**  (formula: L×W×H)")
+
+    st.markdown("---")
+
+    # --- Brain Teaser ---
+    st.subheader("Brain Teaser")
+    bt = st.selectbox(
+        "If you double each dimension of a cube, the volume becomes...",
+        ["(choose)", "2 times", "4 times", "8 times"],
+        index=0, key="cube_bt"
+    )
 
     if st.button("Stabilize Air System"):
-        ok_cube = to_int(side) == 27
-        ok_box = (to_int(l) == 5 and to_int(w) == 2 and to_int(h) == 4)
-        vol_box = 5 * 2 * 4 if ok_box else None
-        ok_box_val = (vol_box == 40)
+        ok_cube = (int(side) == 3 and cube_vol == 27)  # side=3 → 27 cm³
+        ok_box_val = (rect_vol == 40)                  # any L,W,H with product 40 is accepted
         ok_bt = (bt == "8 times")
 
         if ok_cube and ok_box_val and ok_bt:
             st.success("Air stabilized! Key #3 collected.")
             collect_key("key3", "Air Chip")
-            with st.expander("Mini‑Story Card #3"):
-                st.write("🌬️ The air flows smoothly. A metal card drops out: **ACCESS — Bit‑Bot Room**.")
+            with st.expander("Mini-Story Card #3"):
+                st.write("🌬️ The air flows smoothly. A metal card drops out: **ACCESS — Bit-Bot Room**.")
             audio_player("success", "Success chime")
             st.session_state["scene"] = 4
             st.rerun()
         else:
-            st.error("Recheck the cube volume (3×3×3), the box (L×W×H), and the brain teaser.")
+            st.error("Recheck: cube side 3 → 27 cm³, box volume must be 40 cm³, and doubling dimensions makes volume 8×.")
 
 # Scene 4: Bit‑Bot Room — Algorithmic Thinking
 elif st.session_state["scene"] == 4:
