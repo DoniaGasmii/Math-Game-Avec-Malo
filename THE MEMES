@@ -1,0 +1,130 @@
+import streamlit as st
+import threading
+import random
+import time
+
+st.set_page_config(page_title="winn 1000 dolla dolla", page_icon="", layout="wide")
+st.markdown("<h1 style='text-align:center;color:#ff00aa;'> MAX CHAOS </h1>", unsafe_allow_html=True)
+
+# --------------------------
+# SESSION STATE
+# --------------------------
+if "running" not in st.session_state:
+    st.session_state.running = False
+if "memes_running" not in st.session_state:
+    st.session_state.memes_running = False
+
+# --------------------------
+# PLACEHOLDERS
+# --------------------------
+main_box = st.empty()
+meme_box = st.empty()
+chicken_box = st.empty()
+
+# --------------------------
+# COLOR + TEXT DATA
+# --------------------------
+COLORS = ['#ff0077','#00ff88','#33ccff','#ffcc00','#ff4444','#7a5cff','#ff6600',
+          '#00ffee','#ff00ff','#ff99cc','#00ccff','#ffbb33','#88ff00','#ff0066','#cc00ff']
+
+TEMPLATES = ["When you","Me when","POV:","Nobody:","Also me:","Expectation:","Reality:","Plot twist:"]
+ACTIONS = ["open the project","run the build","see 0 tests fail","your dog walks on your keyboard","the coffee kicks in","your Wi-Fi dies"]
+SUBJECTS = ["in production","at 3 AM","during standup","before breakfast","right after deployment"]
+
+# --------------------------
+# MEME FLOOD (auto-start)
+# --------------------------
+def meme_flood():
+    while True:
+        if not st.session_state.memes_running:
+            break
+        meme = f"{random.choice(TEMPLATES)} {random.choice(ACTIONS)} {random.choice(SUBJECTS)} "
+        meme_box.markdown(
+            f"<div style='color:{random.choice(COLORS)}; font-size:{random.randint(18,30)}px;'>{meme}</div>",
+            unsafe_allow_html=True
+        )
+        time.sleep(0.05)
+
+# --------------------------
+# CHAOS PRANKS
+# --------------------------
+def browser_history_prank():
+    main_box.markdown(
+        "<div style='background:#220022;color:#ff0077;padding:20px;border-radius:10px;'>"
+        "I released your browser history 💀</div>",
+        unsafe_allow_html=True
+    )
+    fake_entries = [
+        "2025-11-03 09:12 — pineapple-on-pizza-fanclub.example",
+        "2025-11-02 22:01 — cats-in-socks-enthusiasts.example",
+        "2025-10-31 18:44 — how-to-build-a-rockets-not-really.example",
+    ]
+    for e in fake_entries:
+        if not st.session_state.running: return
+        main_box.markdown(f"<div style='color:{random.choice(COLORS)}'>{e}</div>", unsafe_allow_html=True)
+        time.sleep(3)
+    main_box.markdown("<div style='color:lime;'>jk, it’s fake 😎</div>", unsafe_allow_html=True)
+
+def chicken_chorus():
+    for _ in range(15):
+        if not st.session_state.running: return
+        chickens = []
+        for _ in range(40):
+            left = random.randint(0, 90)
+            top = random.randint(0, 90)
+            rot = random.randint(0, 360)
+            emoji = random.choice(["🐔","🐓","🐤"])
+            chickens.append(
+                f"<div style='position:absolute;left:{left}%;top:{top}%;transform:rotate({rot}deg);font-size:{random.randint(18,40)}px;'>{emoji}</div>"
+            )
+        html = "<div style='position:relative;width:100%;height:400px;'>" + "".join(chickens) + "</div>"
+        chicken_box.markdown(html, unsafe_allow_html=True)
+        time.sleep(0.25)
+    chicken_box.empty()
+
+def max_volume_67():
+    for _ in range(15):
+        if not st.session_state.running: return
+        main_box.markdown(
+            f"<div style='color:{random.choice(COLORS)};font-size:48px;font-weight:900;'>🔊 MAX VOLUME 67 🔊</div>",
+            unsafe_allow_html=True
+        )
+        time.sleep(0.15)
+
+# --------------------------
+# MAIN CHAOS LOOP
+# --------------------------
+def chaos_loop():
+    pranks = [browser_history_prank, chicken_chorus, max_volume_67]
+    while st.session_state.running:
+        prank = random.choice(pranks)
+        prank()
+        time.sleep(random.uniform(0.5, 1.5))
+
+# --------------------------
+# BUTTON CALLBACKS
+# --------------------------
+def start_chaos():
+    if not st.session_state.running:
+        st.session_state.running = True
+        threading.Thread(target=chaos_loop, daemon=True).start()
+
+def stop_chaos():
+    st.session_state.running = False
+    main_box.markdown("<div style='color:white;font-size:24px;'>Stopped.</div>", unsafe_allow_html=True)
+    chicken_box.empty()
+
+# --------------------------
+# BUTTONS + STATUS
+# --------------------------
+col1, col2 = st.columns(2)
+col1.button("START", on_click=start_chaos)
+col2.button("STOP", on_click=stop_chaos)
+st.markdown(f"**Chaos running:** {st.session_state.running} • **Memes running:** {st.session_state.memes_running}")
+
+# --------------------------
+# AUTO-START MEMES
+# --------------------------
+if not st.session_state.memes_running:
+    st.session_state.memes_running = True
+    threading.Thread(target=meme_flood, daemon=True).start()
